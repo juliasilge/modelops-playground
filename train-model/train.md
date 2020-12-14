@@ -1,25 +1,11 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '`r Sys.Date()`'
+date: '2020-12-14'
 output: github_document
 ---
 
-```{r setup, include=FALSE}
-library(knitr)
-knitr::opts_chunk$set(cache = TRUE, cache.lazy = FALSE, warning = FALSE, 
-                      message = FALSE, echo = TRUE, dpi = 180,
-                      fig.width = 8, fig.height = 5)
 
-knitr::opts_knit$set(root.dir = here::here("train-model"))
-
-library(tidyverse)
-library(scales)
-library(silgelib)
-theme_set(theme_plex())
-## if you don't have fancy fonts like IBM Plex installed, run
-## theme_set(theme_minimal())
-```
 
 Let's build a model for [traffic crashes in Chicago](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if). We can build a model to predict whether a crash involved an injury or not.
 
@@ -31,7 +17,8 @@ Let's build a model for [traffic crashes in Chicago](https://data.cityofchicago.
 
 Let's download the last two years of data to train our model.
 
-```{r}
+
+```r
 library(tidyverse)
 library(lubridate)
 library(RSocrata)
@@ -59,7 +46,8 @@ crash <- crash_raw %>%
 ```
 
 
-```{r}
+
+```r
 library(lubridate)
 crash %>%
   mutate(crash_date = floor_date(crash_date, unit = "month")) %>%
@@ -72,11 +60,14 @@ crash %>%
        color = "Injuries?")
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
 Ah, 2020!
 
 How does the injury rate change through the week?
 
-```{r}
+
+```r
 crash %>%
   mutate(crash_date = wday(crash_date, label = TRUE)) %>%
   count(crash_date, injuries) %>%
@@ -89,9 +80,12 @@ crash %>%
   labs(x = "% of crashes", y = NULL, fill = "Injuries?")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
 How do injuries vary with first crash type?
 
-```{r}
+
+```r
 crash %>%
   count(first_crash_type, injuries) %>%
   mutate(first_crash_type = fct_reorder(first_crash_type, n)) %>%
@@ -107,9 +101,12 @@ crash %>%
   labs(x = "% of crashes", y = NULL, fill = "Injuries?")
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
 Are injuries more likely in different locations?
 
-```{r, fig.height=8}
+
+```r
 crash %>%
   filter(latitude > 0) %>%
   ggplot(aes(longitude, latitude, color = injuries)) +
@@ -119,12 +116,15 @@ crash %>%
   coord_fixed()
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
 
 ## Build a model
 
 Let's start by splitting our data and creating cross-validation folds.
 
-```{r}
+
+```r
 library(tidymodels)
 
 set.seed(2020)
@@ -137,12 +137,30 @@ crash_folds <- vfold_cv(crash_train, strata = injuries)
 crash_folds
 ```
 
+```
+## #  10-fold cross-validation using stratification 
+## # A tibble: 10 x 2
+##    splits                 id    
+##    <list>                 <chr> 
+##  1 <split [141.1K/15.7K]> Fold01
+##  2 <split [141.1K/15.7K]> Fold02
+##  3 <split [141.1K/15.7K]> Fold03
+##  4 <split [141.1K/15.7K]> Fold04
+##  5 <split [141.1K/15.7K]> Fold05
+##  6 <split [141.1K/15.7K]> Fold06
+##  7 <split [141.1K/15.7K]> Fold07
+##  8 <split [141.1K/15.7K]> Fold08
+##  9 <split [141.1K/15.7K]> Fold09
+## 10 <split [141.1K/15.7K]> Fold10
+```
+
 Next, let's create a model. 
 
 - The feature engineering includes creating date features such as day of the week, handling the high cardinality of weather conditions, contributing cause, etc, and perhaps most importantly, downsampling to account for the class imbalance (injuries are more rare than non-injury-causing crashes).
 - After experimenting with random forests and xgboost, this smaller bagged tree model achieved very nearly the same performance with a much smaller model "footprint" in terms of model size and prediction time.
 
-```{r}
+
+```r
 library(themis)
 library(textrecipes)
 library(baguette)
@@ -167,9 +185,37 @@ crash_wf <- workflow() %>%
 crash_wf
 ```
 
+```
+## ══ Workflow ══════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: bag_tree()
+## 
+## ── Preprocessor ──────────────────────────────────────────────────────────────────
+## 5 Recipe Steps
+## 
+## ● step_date()
+## ● step_rm()
+## ● step_other()
+## ● step_clean_levels()
+## ● step_downsample()
+## 
+## ── Model ─────────────────────────────────────────────────────────────────────────
+## Bagged Decision Tree Model Specification (classification)
+## 
+## Main Arguments:
+##   cost_complexity = 0
+##   min_n = 10
+## 
+## Engine-Specific Arguments:
+##   times = 25
+## 
+## Computational engine: rpart
+```
+
 Let's fit this model to the cross-validation resamples to understand how well it will perform.
 
-```{r}
+
+```r
 doParallel::registerDoParallel()
 crash_res <- fit_resamples(
   crash_wf,
@@ -185,22 +231,41 @@ crash_res <- fit_resamples(
 
 What do the results look like?
 
-```{r}
+
+```r
 collect_metrics(crash_res)
+```
+
+```
+## # A tibble: 2 x 6
+##   .metric  .estimator  mean     n std_err .config             
+##   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
+## 1 accuracy binary     0.727    10 0.00141 Preprocessor1_Model1
+## 2 roc_auc  binary     0.819    10 0.00142 Preprocessor1_Model1
 ```
 
 This is almost exactly what we achieved with models like random forest and xgboost, and looks to be about as good as we can do with this data.
 
 Let's now **fit** to the entire training set and **evaluate** on the testing set.
 
-```{r}
+
+```r
 crash_fit <- last_fit(crash_wf, crash_split)
 collect_metrics(crash_fit)
 ```
 
+```
+## # A tibble: 2 x 4
+##   .metric  .estimator .estimate .config             
+##   <chr>    <chr>          <dbl> <chr>               
+## 1 accuracy binary         0.727 Preprocessor1_Model1
+## 2 roc_auc  binary         0.821 Preprocessor1_Model1
+```
+
 Which features were most important in predicting an injury?
 
-```{r}
+
+```r
 crash_imp <- crash_fit$.workflow[[1]] %>%
   pull_workflow_fit()
 
@@ -211,9 +276,12 @@ crash_imp$fit$imp %>%
   labs(x = "Variable importance score", y = NULL)
 ```
 
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
+
 How does the ROC curve look?
 
-```{r}
+
+```r
 collect_predictions(crash_fit) %>%
   group_by(id) %>%
   roc_curve(injuries, .pred_injuries) %>%
@@ -227,25 +295,58 @@ collect_predictions(crash_fit) %>%
   coord_equal()
 ```
 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+
 ## Save model
 
 We are happy with this model, so we need to save (serialize) it to be used in our model API. We can [`butcher()` the model](https://tidymodels.github.io/butcher/) to make it as small as possible. This does not affect the predictions.
 
-```{r}
+
+```r
 crash_wf_model <- butcher::butcher(crash_fit$.workflow[[1]])
 predict(crash_fit$.workflow[[1]], crash_test[222,])
+```
+
+```
+## # A tibble: 1 x 1
+##   .pred_class
+##   <fct>      
+## 1 injuries
+```
+
+```r
 predict(crash_wf_model, crash_test[222,])
+```
+
+```
+## # A tibble: 1 x 1
+##   .pred_class
+##   <fct>      
+## 1 injuries
 ```
 
 This model is already pretty streamlined so it doesn't make a huge difference, but every little bit helps!
 
-```{r}
+
+```r
 lobstr::obj_size(crash_fit$.workflow[[1]])
+```
+
+```
+## 98,512,288 B
+```
+
+```r
 lobstr::obj_size(crash_wf_model)
+```
+
+```
+## 95,040,496 B
 ```
 
 Now let's save this model to be used later.
 
-```{r}
+
+```r
 saveRDS(crash_wf_model, here::here("artifacts", "crash-wf-model.rds"))
 ```
