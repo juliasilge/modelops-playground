@@ -344,9 +344,10 @@ lobstr::obj_size(crash_wf_model)
 ## 95,040,496 B
 ```
 
-Now let's save this model to be used later.
+Now let's save this model and the metrics to be used later.
 
 
 ```r
-saveRDS(crash_wf_model, here::here("artifacts", "crash-wf-model.rds"))
+saveRDS(crash_wf_model, here::here("crash-api", "crash-wf-model.rds"))
+write_csv(collect_metrics(crash_res), here::here("crash-api", "crash-model-metrics.csv"))
 ```
