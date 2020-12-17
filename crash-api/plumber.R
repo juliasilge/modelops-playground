@@ -19,7 +19,7 @@ crash_metrics <- readr::read_csv("crash-model-metrics.csv") %>%
 
 #* Submit crash data and get a predicted probability of injury
 #* @param preds Predictors for Chicago traffic dataset
-#* @json
+#* @serializer json
 #* @post /predict
 function(preds) {
   preds <- jsonlite::fromJSON(preds)
@@ -28,7 +28,7 @@ function(preds) {
 }
 
 #* Expected model metrics from training
-#* @json
+#* @serializer json
 #* @get /metrics
 function() {
   crash_metrics
