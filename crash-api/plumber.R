@@ -18,11 +18,11 @@ crash_metrics <- readr::read_csv("crash-model-metrics.csv") %>%
 #* @apiDescription Model predicting probability of an injury for traffic crashes in Chicago
 
 #* Submit crash data and get a predicted probability of injury
-#* @param preds Predictors for Chicago traffic dataset
-#* @json
+#* @serializer json
+#* @parser json
 #* @post /predict
-function(preds) {
-  preds <- jsonlite::fromJSON(preds)
+function(req, res) {
+  preds <- req$body
   preds$crash_date <- as.POSIXct(preds$crash_date)
   predict(crash_wf_model, preds)
 }
