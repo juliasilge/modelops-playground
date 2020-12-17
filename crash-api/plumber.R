@@ -28,7 +28,7 @@ function(req, res) {
 }
 
 #* Expected model metrics from training
-#* @json
+#* @serializer json
 #* @get /metrics
 function() {
   crash_metrics
