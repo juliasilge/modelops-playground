@@ -1,0 +1,26 @@
+{
+	"info": {
+		"_postman_id": "2961783c-6faf-422e-b539-99dddab83158",
+		"name": "modelops-playground",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "predict",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{root_url}}/predict",
+					"host": [
+						"{{root_url}}"
+					],
+					"path": [
+						"predict"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
