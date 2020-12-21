@@ -1,7 +1,7 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '2020-12-14'
+date: '2020-12-21'
 output: github_document
 ---
 
@@ -50,19 +50,41 @@ crash <- crash_raw %>%
 ```r
 library(lubridate)
 crash %>%
-  mutate(crash_date = floor_date(crash_date, unit = "month")) %>%
+  mutate(crash_date = floor_date(crash_date, unit = "week")) %>%
   count(crash_date, injuries) %>%
-  filter(crash_date != last(crash_date)) %>%
+  filter(crash_date != last(crash_date),
+         crash_date != first(crash_date)) %>%
   ggplot(aes(crash_date, n, color = injuries)) +
   geom_line(size = 1.5, alpha = 0.7) +
   scale_y_continuous(limits = (c(0, NA))) +
-  labs(x = NULL, y = "Number of traffic crashes per month",
+  labs(x = NULL, y = "Number of traffic crashes per week",
        color = "Injuries?")
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 Ah, 2020!
+
+How has the injury rate changed over time?
+
+
+```r
+crash %>%
+  mutate(crash_date = floor_date(crash_date, unit = "week")) %>%
+  count(crash_date, injuries) %>%
+  filter(crash_date != last(crash_date),
+         crash_date != first(crash_date)) %>%
+  group_by(crash_date) %>%
+  mutate(percent_injury = n / sum(n)) %>%
+  ungroup() %>%
+  filter(injuries == "injuries") %>%
+  ggplot(aes(crash_date, percent_injury)) +
+  geom_line(size = 1.5, alpha = 0.7, color = "midnightblue") +
+  scale_y_continuous(limits = c(0, NA), labels = percent_format()) +
+  labs(x = NULL, y = "% of crashes that involve injuries")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 How does the injury rate change through the week?
 
@@ -80,7 +102,7 @@ crash %>%
   labs(x = "% of crashes", y = NULL, fill = "Injuries?")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
 How do injuries vary with first crash type?
 
@@ -101,7 +123,7 @@ crash %>%
   labs(x = "% of crashes", y = NULL, fill = "Injuries?")
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
 
 Are injuries more likely in different locations?
 
@@ -116,7 +138,7 @@ crash %>%
   coord_fixed()
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
 
 
 ## Build a model
@@ -142,16 +164,16 @@ crash_folds
 ## # A tibble: 10 x 2
 ##    splits                 id    
 ##    <list>                 <chr> 
-##  1 <split [141.1K/15.7K]> Fold01
-##  2 <split [141.1K/15.7K]> Fold02
-##  3 <split [141.1K/15.7K]> Fold03
-##  4 <split [141.1K/15.7K]> Fold04
-##  5 <split [141.1K/15.7K]> Fold05
-##  6 <split [141.1K/15.7K]> Fold06
-##  7 <split [141.1K/15.7K]> Fold07
-##  8 <split [141.1K/15.7K]> Fold08
-##  9 <split [141.1K/15.7K]> Fold09
-## 10 <split [141.1K/15.7K]> Fold10
+##  1 <split [140.5K/15.6K]> Fold01
+##  2 <split [140.5K/15.6K]> Fold02
+##  3 <split [140.5K/15.6K]> Fold03
+##  4 <split [140.5K/15.6K]> Fold04
+##  5 <split [140.5K/15.6K]> Fold05
+##  6 <split [140.5K/15.6K]> Fold06
+##  7 <split [140.5K/15.6K]> Fold07
+##  8 <split [140.5K/15.6K]> Fold08
+##  9 <split [140.5K/15.6K]> Fold09
+## 10 <split [140.5K/15.6K]> Fold10
 ```
 
 Next, let's create a model. 
@@ -186,11 +208,11 @@ crash_wf
 ```
 
 ```
-## ══ Workflow ══════════════════════════════════════════════════════════════════════
+## ══ Workflow ══════════════════════════════════════════════════════════════════════════════
 ## Preprocessor: Recipe
 ## Model: bag_tree()
 ## 
-## ── Preprocessor ──────────────────────────────────────────────────────────────────
+## ── Preprocessor ──────────────────────────────────────────────────────────────────────────
 ## 5 Recipe Steps
 ## 
 ## ● step_date()
@@ -199,7 +221,7 @@ crash_wf
 ## ● step_clean_levels()
 ## ● step_downsample()
 ## 
-## ── Model ─────────────────────────────────────────────────────────────────────────
+## ── Model ─────────────────────────────────────────────────────────────────────────────────
 ## Bagged Decision Tree Model Specification (classification)
 ## 
 ## Main Arguments:
@@ -225,8 +247,6 @@ crash_res <- fit_resamples(
 ```
 
 
-
-
 ## Evaluate model
 
 What do the results look like?
@@ -238,10 +258,10 @@ collect_metrics(crash_res)
 
 ```
 ## # A tibble: 2 x 6
-##   .metric  .estimator  mean     n std_err .config             
-##   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-## 1 accuracy binary     0.727    10 0.00141 Preprocessor1_Model1
-## 2 roc_auc  binary     0.819    10 0.00142 Preprocessor1_Model1
+##   .metric  .estimator  mean     n  std_err .config             
+##   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
+## 1 accuracy binary     0.725    10 0.000700 Preprocessor1_Model1
+## 2 roc_auc  binary     0.819    10 0.00135  Preprocessor1_Model1
 ```
 
 This is almost exactly what we achieved with models like random forest and xgboost, and looks to be about as good as we can do with this data.
@@ -258,8 +278,8 @@ collect_metrics(crash_fit)
 ## # A tibble: 2 x 4
 ##   .metric  .estimator .estimate .config             
 ##   <chr>    <chr>          <dbl> <chr>               
-## 1 accuracy binary         0.727 Preprocessor1_Model1
-## 2 roc_auc  binary         0.821 Preprocessor1_Model1
+## 1 accuracy binary         0.728 Preprocessor1_Model1
+## 2 roc_auc  binary         0.820 Preprocessor1_Model1
 ```
 
 Which features were most important in predicting an injury?
@@ -276,7 +296,7 @@ crash_imp$fit$imp %>%
   labs(x = "Variable importance score", y = NULL)
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
 
 How does the ROC curve look?
 
@@ -295,7 +315,7 @@ collect_predictions(crash_fit) %>%
   coord_equal()
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
 
 ## Save model
 
@@ -333,7 +353,7 @@ lobstr::obj_size(crash_fit$.workflow[[1]])
 ```
 
 ```
-## 98,512,288 B
+## 97,745,584 B
 ```
 
 ```r
@@ -341,7 +361,7 @@ lobstr::obj_size(crash_wf_model)
 ```
 
 ```
-## 95,040,496 B
+## 97,745,584 B
 ```
 
 Now let's save this model and the metrics to be used later.

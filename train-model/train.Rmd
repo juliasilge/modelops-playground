@@ -15,10 +15,7 @@ knitr::opts_knit$set(root.dir = here::here("train-model"))
 
 library(tidyverse)
 library(scales)
-library(silgelib)
-theme_set(theme_plex())
-## if you don't have fancy fonts like IBM Plex installed, run
-## theme_set(theme_minimal())
+theme_set(theme_minimal())
 ```
 
 Let's build a model for [traffic crashes in Chicago](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if). We can build a model to predict whether a crash involved an injury or not.
@@ -62,17 +59,36 @@ crash <- crash_raw %>%
 ```{r}
 library(lubridate)
 crash %>%
-  mutate(crash_date = floor_date(crash_date, unit = "month")) %>%
+  mutate(crash_date = floor_date(crash_date, unit = "week")) %>%
   count(crash_date, injuries) %>%
-  filter(crash_date != last(crash_date)) %>%
+  filter(crash_date != last(crash_date),
+         crash_date != first(crash_date)) %>%
   ggplot(aes(crash_date, n, color = injuries)) +
   geom_line(size = 1.5, alpha = 0.7) +
   scale_y_continuous(limits = (c(0, NA))) +
-  labs(x = NULL, y = "Number of traffic crashes per month",
+  labs(x = NULL, y = "Number of traffic crashes per week",
        color = "Injuries?")
 ```
 
 Ah, 2020!
+
+How has the injury rate changed over time?
+
+```{r}
+crash %>%
+  mutate(crash_date = floor_date(crash_date, unit = "week")) %>%
+  count(crash_date, injuries) %>%
+  filter(crash_date != last(crash_date),
+         crash_date != first(crash_date)) %>%
+  group_by(crash_date) %>%
+  mutate(percent_injury = n / sum(n)) %>%
+  ungroup() %>%
+  filter(injuries == "injuries") %>%
+  ggplot(aes(crash_date, percent_injury)) +
+  geom_line(size = 1.5, alpha = 0.7, color = "midnightblue") +
+  scale_y_continuous(limits = c(0, NA), labels = percent_format()) +
+  labs(x = NULL, y = "% of crashes that involve injuries")
+```
 
 How does the injury rate change through the week?
 
@@ -177,8 +193,6 @@ crash_res <- fit_resamples(
   control = control_resamples(save_pred = TRUE)
 )
 ```
-
-
 
 
 ## Evaluate model
