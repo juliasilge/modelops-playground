@@ -7,6 +7,7 @@ library(workflows)
 library(recipes)
 library(textrecipes)
 library(themis)
+library(baguette)
 
 ## Load model + metrics
 crash_wf_model <- readRDS("crash-wf-model.rds")
