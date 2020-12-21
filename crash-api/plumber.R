@@ -18,7 +18,6 @@ crash_metrics <- readr::read_csv("crash-model-metrics.csv") %>%
 #* @apiDescription Model predicting probability of an injury for traffic crashes in Chicago
 
 #* Submit crash data and get a predicted probability of injury
-#* @param preds Predictors for Chicago traffic dataset
 #* @serializer json
 #* @parser json
 #* @post /predict
