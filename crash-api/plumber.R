@@ -23,7 +23,7 @@ crash_metrics <- readr::read_csv("crash-model-metrics.csv") %>%
 #* @post /predict
 function(req, res) {
   preds <- req$body
-  preds$crash_date <- as.POSIXct(preds$crash_date)
+  preds$crash_date <- as.POSIXct(preds$crash_date, tz = "America/Chicago")
   predict(crash_wf_model, preds)
 }
 
