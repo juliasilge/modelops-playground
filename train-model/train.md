@@ -1,7 +1,7 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '2020-12-21'
+date: '2020-12-28'
 output: github_document
 ---
 
@@ -164,16 +164,16 @@ crash_folds
 ## # A tibble: 10 x 2
 ##    splits                 id    
 ##    <list>                 <chr> 
-##  1 <split [140.5K/15.6K]> Fold01
-##  2 <split [140.5K/15.6K]> Fold02
-##  3 <split [140.5K/15.6K]> Fold03
-##  4 <split [140.5K/15.6K]> Fold04
-##  5 <split [140.5K/15.6K]> Fold05
-##  6 <split [140.5K/15.6K]> Fold06
-##  7 <split [140.5K/15.6K]> Fold07
-##  8 <split [140.5K/15.6K]> Fold08
-##  9 <split [140.5K/15.6K]> Fold09
-## 10 <split [140.5K/15.6K]> Fold10
+##  1 <split [140.3K/15.6K]> Fold01
+##  2 <split [140.3K/15.6K]> Fold02
+##  3 <split [140.3K/15.6K]> Fold03
+##  4 <split [140.3K/15.6K]> Fold04
+##  5 <split [140.3K/15.6K]> Fold05
+##  6 <split [140.3K/15.6K]> Fold06
+##  7 <split [140.3K/15.6K]> Fold07
+##  8 <split [140.3K/15.6K]> Fold08
+##  9 <split [140.3K/15.6K]> Fold09
+## 10 <split [140.3K/15.6K]> Fold10
 ```
 
 Next, let's create a model. 
@@ -258,10 +258,10 @@ collect_metrics(crash_res)
 
 ```
 ## # A tibble: 2 x 6
-##   .metric  .estimator  mean     n  std_err .config             
-##   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-## 1 accuracy binary     0.725    10 0.000700 Preprocessor1_Model1
-## 2 roc_auc  binary     0.819    10 0.00135  Preprocessor1_Model1
+##   .metric  .estimator  mean     n std_err .config             
+##   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
+## 1 accuracy binary     0.726    10 0.00122 Preprocessor1_Model1
+## 2 roc_auc  binary     0.820    10 0.00154 Preprocessor1_Model1
 ```
 
 This is almost exactly what we achieved with models like random forest and xgboost, and looks to be about as good as we can do with this data.
@@ -279,7 +279,7 @@ collect_metrics(crash_fit)
 ##   .metric  .estimator .estimate .config             
 ##   <chr>    <chr>          <dbl> <chr>               
 ## 1 accuracy binary         0.728 Preprocessor1_Model1
-## 2 roc_auc  binary         0.820 Preprocessor1_Model1
+## 2 roc_auc  binary         0.819 Preprocessor1_Model1
 ```
 
 Which features were most important in predicting an injury?
@@ -331,7 +331,7 @@ predict(crash_fit$.workflow[[1]], crash_test[222,])
 ## # A tibble: 1 x 1
 ##   .pred_class
 ##   <fct>      
-## 1 injuries
+## 1 none
 ```
 
 ```r
@@ -342,7 +342,7 @@ predict(crash_wf_model, crash_test[222,])
 ## # A tibble: 1 x 1
 ##   .pred_class
 ##   <fct>      
-## 1 injuries
+## 1 none
 ```
 
 This model is already pretty streamlined so it doesn't make a huge difference, but every little bit helps!
@@ -353,7 +353,7 @@ lobstr::obj_size(crash_fit$.workflow[[1]])
 ```
 
 ```
-## 97,745,584 B
+## 97,980,376 B
 ```
 
 ```r
@@ -361,7 +361,7 @@ lobstr::obj_size(crash_wf_model)
 ```
 
 ```
-## 97,745,584 B
+## 97,980,376 B
 ```
 
 Now let's save this model and the metrics to be used later.
