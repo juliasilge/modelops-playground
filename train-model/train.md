@@ -243,7 +243,6 @@ crash_res <- fit_resamples(
 )
 ```
 
-
 ## Evaluate model
 
 What do the results look like?
@@ -316,20 +315,15 @@ collect_predictions(crash_fit) %>%
 
 ## Save model
 
-We are happy with this model, so we need to save (serialize) it to be used in our model API. We can [`butcher()` the model](https://tidymodels.github.io/butcher/) to make it as small as possible. This does not affect the predictions.
+We are happy with this model, so we need to save (serialize) it to be used in our model API.
 
 
 ```r
-crash_wf_model <- butcher::butcher(crash_fit$.workflow[[1]])
-predict(crash_fit$.workflow[[1]], crash_test[222,])
+crash_wf_model <- crash_fit$.workflow[[1]]
 ```
 
-```
-## # A tibble: 1 x 1
-##   .pred_class
-##   <fct>      
-## 1 none
-```
+This is an object we can make predictions with:
+
 
 ```r
 predict(crash_wf_model, crash_test[222,])
@@ -342,29 +336,14 @@ predict(crash_wf_model, crash_test[222,])
 ## 1 none
 ```
 
-This model is already pretty streamlined so it doesn't make a huge difference, but every little bit helps!
-
-
-```r
-lobstr::obj_size(crash_fit$.workflow[[1]])
-```
-
-```
-## 97,885,200 B
-```
-
-```r
-lobstr::obj_size(crash_wf_model)
-```
-
-```
-## 97,885,200 B
-```
-
 Now let's save this model and the metrics to be used later.
 
 
 ```r
 saveRDS(crash_wf_model, here::here("crash-api", "crash-wf-model.rds"))
-write_csv(collect_metrics(crash_res), here::here("crash-api", "crash-model-metrics.csv"))
+
+collect_metrics(crash_res) %>%
+  write_csv(here::here("crash-api", "crash-model-metrics.csv"))
 ```
+
+**NOTE:** We can [`butcher()` the model](https://tidymodels.github.io/butcher/) to make it smaller in some cases, but this bagged tree model is already streamlined.
