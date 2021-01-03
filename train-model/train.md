@@ -1,7 +1,7 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '2020-12-28'
+date: '2021-01-03'
 output: github_document
 ---
 
@@ -162,18 +162,18 @@ crash_folds
 ```
 ## #  10-fold cross-validation using stratification 
 ## # A tibble: 10 x 2
-##    splits                 id    
-##    <list>                 <chr> 
-##  1 <split [140.3K/15.6K]> Fold01
-##  2 <split [140.3K/15.6K]> Fold02
-##  3 <split [140.3K/15.6K]> Fold03
-##  4 <split [140.3K/15.6K]> Fold04
-##  5 <split [140.3K/15.6K]> Fold05
-##  6 <split [140.3K/15.6K]> Fold06
-##  7 <split [140.3K/15.6K]> Fold07
-##  8 <split [140.3K/15.6K]> Fold08
-##  9 <split [140.3K/15.6K]> Fold09
-## 10 <split [140.3K/15.6K]> Fold10
+##    splits               id    
+##    <list>               <chr> 
+##  1 <split [140K/15.6K]> Fold01
+##  2 <split [140K/15.6K]> Fold02
+##  3 <split [140K/15.6K]> Fold03
+##  4 <split [140K/15.6K]> Fold04
+##  5 <split [140K/15.6K]> Fold05
+##  6 <split [140K/15.6K]> Fold06
+##  7 <split [140K/15.6K]> Fold07
+##  8 <split [140K/15.6K]> Fold08
+##  9 <split [140K/15.6K]> Fold09
+## 10 <split [140K/15.6K]> Fold10
 ```
 
 Next, let's create a model. 
@@ -184,7 +184,6 @@ Next, let's create a model.
 
 ```r
 library(themis)
-library(textrecipes)
 library(baguette)
 
 crash_rec <- recipe(injuries ~ ., data = crash_train) %>%
@@ -193,7 +192,6 @@ crash_rec <- recipe(injuries ~ ., data = crash_train) %>%
   step_other(weather_condition, first_crash_type, 
              trafficway_type, prim_contributory_cause,
              other = "OTHER") %>%
-  step_clean_levels(all_nominal(), -injuries) %>%
   step_downsample(injuries)
 
 bag_spec <- bag_tree(min_n = 10) %>% 
@@ -213,12 +211,11 @@ crash_wf
 ## Model: bag_tree()
 ## 
 ## ── Preprocessor ──────────────────────────────────────────────────────────────────────────
-## 5 Recipe Steps
+## 4 Recipe Steps
 ## 
 ## ● step_date()
 ## ● step_rm()
 ## ● step_other()
-## ● step_clean_levels()
 ## ● step_downsample()
 ## 
 ## ── Model ─────────────────────────────────────────────────────────────────────────────────
@@ -258,10 +255,10 @@ collect_metrics(crash_res)
 
 ```
 ## # A tibble: 2 x 6
-##   .metric  .estimator  mean     n std_err .config             
-##   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-## 1 accuracy binary     0.726    10 0.00122 Preprocessor1_Model1
-## 2 roc_auc  binary     0.820    10 0.00154 Preprocessor1_Model1
+##   .metric  .estimator  mean     n  std_err .config             
+##   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
+## 1 accuracy binary     0.727    10 0.00136  Preprocessor1_Model1
+## 2 roc_auc  binary     0.819    10 0.000788 Preprocessor1_Model1
 ```
 
 This is almost exactly what we achieved with models like random forest and xgboost, and looks to be about as good as we can do with this data.
@@ -278,8 +275,8 @@ collect_metrics(crash_fit)
 ## # A tibble: 2 x 4
 ##   .metric  .estimator .estimate .config             
 ##   <chr>    <chr>          <dbl> <chr>               
-## 1 accuracy binary         0.728 Preprocessor1_Model1
-## 2 roc_auc  binary         0.819 Preprocessor1_Model1
+## 1 accuracy binary         0.725 Preprocessor1_Model1
+## 2 roc_auc  binary         0.817 Preprocessor1_Model1
 ```
 
 Which features were most important in predicting an injury?
@@ -353,7 +350,7 @@ lobstr::obj_size(crash_fit$.workflow[[1]])
 ```
 
 ```
-## 97,980,376 B
+## 97,885,200 B
 ```
 
 ```r
@@ -361,7 +358,7 @@ lobstr::obj_size(crash_wf_model)
 ```
 
 ```
-## 97,980,376 B
+## 97,885,200 B
 ```
 
 Now let's save this model and the metrics to be used later.

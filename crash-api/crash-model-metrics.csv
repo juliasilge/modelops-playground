@@ -1,3 +1,3 @@
 .metric,.estimator,mean,n,std_err,.config
-accuracy,binary,0.7258086941770107,10,0.0012174128990159688,Preprocessor1_Model1
-roc_auc,binary,0.8197348436567216,10,0.0015390025837130556,Preprocessor1_Model1
+accuracy,binary,0.7268847018883419,10,0.0013614467671637213,Preprocessor1_Model1
+roc_auc,binary,0.8190878910313955,10,7.880771221987304e-4,Preprocessor1_Model1

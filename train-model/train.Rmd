@@ -160,7 +160,6 @@ Next, let's create a model.
 
 ```{r}
 library(themis)
-library(textrecipes)
 library(baguette)
 
 crash_rec <- recipe(injuries ~ ., data = crash_train) %>%
@@ -169,7 +168,6 @@ crash_rec <- recipe(injuries ~ ., data = crash_train) %>%
   step_other(weather_condition, first_crash_type, 
              trafficway_type, prim_contributory_cause,
              other = "OTHER") %>%
-  step_clean_levels(all_nominal(), -injuries) %>%
   step_downsample(injuries)
 
 bag_spec <- bag_tree(min_n = 10) %>% 
