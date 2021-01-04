@@ -53,6 +53,8 @@ crash <- crash_raw %>%
             prim_contributory_cause,
             latitude, longitude) %>%
   na.omit()
+
+glimpse(crash)
 ```
 
 
