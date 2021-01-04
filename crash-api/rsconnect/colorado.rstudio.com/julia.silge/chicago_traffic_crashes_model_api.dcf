@@ -1,0 +1,12 @@
+name: chicago_traffic_crashes_model_api
+title: Chicago traffic crashes model API
+username: julia.silge
+account: julia.silge
+server: colorado.rstudio.com
+hostUrl: https://colorado.rstudio.com/rsc/__api__
+appId: 8358
+bundleId: 42783
+url: https://colorado.rstudio.com/rsc/traffic-crashes/
+when: 1609714663.50303
+asMultiple: FALSE
+asStatic: FALSE

@@ -5,7 +5,6 @@ library(dplyr)
 library(parsnip)
 library(workflows)
 library(recipes)
-library(textrecipes)
 library(themis)
 library(baguette)
 
