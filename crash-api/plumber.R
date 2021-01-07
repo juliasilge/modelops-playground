@@ -24,7 +24,8 @@ crash_metrics <- readr::read_csv("crash-model-metrics.csv") %>%
 function(req, res) {
   preds <- req$body
   preds$crash_date <- as.POSIXct(preds$crash_date, tz = "America/Chicago")
-  predict(crash_wf_model, preds)
+  probs <- predict(crash_wf_model, preds, type = "prob")
+  probs$.pred_injuries
 }
 
 #* Expected model metrics from training

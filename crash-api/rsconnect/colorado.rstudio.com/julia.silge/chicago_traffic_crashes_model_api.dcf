@@ -5,8 +5,8 @@ account: julia.silge
 server: colorado.rstudio.com
 hostUrl: https://colorado.rstudio.com/rsc/__api__
 appId: 8358
-bundleId: 42783
+bundleId: 42873
 url: https://colorado.rstudio.com/rsc/traffic-crashes/
-when: 1609714663.50303
+when: 1609956728.40278
 asMultiple: FALSE
 asStatic: FALSE
