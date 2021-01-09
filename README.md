@@ -10,6 +10,6 @@ This repo contains example model ops workflows for a dataset of [traffic crashes
 
 ## Example tasks
 
-- [Train model](https://github.com/juliasilge/modelops-playground/blob/master/train-model/train.md)
-- Deploy model
-- ...
+- [Train model](https://github.com/tidymodels/modelops-playground/blob/master/train-model/train.md)
+- [Deploy model](https://colorado.rstudio.com/rsc/traffic-crashes/)
+- [Monitor model performance on RStudio Connect](https://colorado.rstudio.com/rsc/traffic-crash-monitor/monitor.html)
