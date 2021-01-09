@@ -1,0 +1,12 @@
+name: monitor_model_for_chicago_traffic_crashes
+title: Monitor model for Chicago traffic crashes
+username: julia.silge
+account: julia.silge
+server: colorado.rstudio.com
+hostUrl: https://colorado.rstudio.com/rsc/__api__
+appId: 8414
+bundleId: 42942
+url: https://colorado.rstudio.com/rsc/content/8414/
+when: 1610156977.10447
+asMultiple: FALSE
+asStatic: FALSE
