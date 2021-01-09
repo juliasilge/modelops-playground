@@ -1,7 +1,7 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '2021-01-03'
+date: '2021-01-08'
 output: github_document
 ---
 
@@ -363,7 +363,7 @@ Now let's save this model and the metrics to be used later.
 ```r
 saveRDS(crash_wf_model, here::here("crash-api", "crash-wf-model.rds"))
 
-collect_metrics(crash_res) %>%
+collect_metrics(crash_fit) %>%
   write_csv(here::here("crash-api", "crash-model-metrics.csv"))
 ```
 
