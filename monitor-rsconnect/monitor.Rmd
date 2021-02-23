@@ -17,6 +17,7 @@ library(httr)
 library(pins)
 library(plotly)
 library(leaflet)
+library(reactable)
 
 ## get old metrics from RStudio Connect
 board_register("rsconnect", server = "https://colorado.rstudio.com/rsc")
@@ -80,7 +81,8 @@ model_metrics <- readr::read_csv(csv_url)
 p <- new_metrics %>%
   filter(.metric %in% c("accuracy", "roc_auc")) %>%
   ggplot(aes(crash_date, .estimate)) +
-  geom_hline(aes(yintercept = mean, color = .metric), model_metrics,
+  geom_hline(aes(yintercept = .estimate, color = .metric), 
+             data = model_metrics,
              alpha = 0.7, size = 1.2, lty = 2) +
   geom_line(aes(color = .metric)) +
   geom_point(aes(color = .metric), size = 2, alpha = 0.8) +
@@ -120,11 +122,32 @@ This plot shows the _new_ crashes used for monitoring since the last time this d
 
 This data exhibits class imbalance, which was addressed during modeling via downsampling.
 
+### Which crashes were misclassified by the bagged tree model?
+
+```{r}
+crash %>%
+  bind_cols(pred_injuries = predictions) %>%
+  select(-crash_date, -latitude, -longitude) %>%
+  filter((pred_injuries > 0.8 & injuries == "none") | (pred_injuries < 0.2 & injuries == "injuries")) %>%
+  arrange(pred_injuries) %>%
+  select(`probability of injury` = pred_injuries, everything()) %>%
+  reactable(defaultSorted = c("probability of injury"), filterable = TRUE,
+            defaultColDef = colDef(header = function(value) gsub("_", " ", value, fixed = TRUE)),
+            columns = list(injuries = colDef(name = "any injuries?"))
+  )
+```
+
+*** 
+
+This table shows the _new_ crashes that our model did the worst job at classifying, in either direction.
+
+Sort and filter to explore these misclassifications.
+
 
 ### How are the crashes distributed across Chicago?
 
 ```{r}
-pal <- colorFactor(c("darkred", "gold"), domain = c("injuries", "none"))
+pal <- colorFactor(c("gray20", "palevioletred3"), domain = c("injuries", "none"))
 
 crash %>%
   filter(latitude > 0) %>% 
@@ -138,6 +161,6 @@ crash %>%
 
 [This dataset](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if) covers traffic crashes on city streets within Chicago city limits under the jurisdiction of the Chicago Police Department. 
 
-This map, like the previous plot, shows the _new_ crashes used for monitoring since the last time this dashboard was generated.
+This map, like the previous panels, shows the _new_ crashes used for monitoring since the last time this dashboard was generated.
 
 
