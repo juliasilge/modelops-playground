@@ -60,10 +60,15 @@ metrics_by_week <- crash %>%
   group_by(crash_date) %>%
   metrics(injuries, predicted, .pred_injuries)
 
+## compute total crashes
+totals_by_week <- crash %>% 
+  mutate(crash_date = floor_date(as.Date(crash_date), unit = "week")) %>% 
+  count(crash_date, name = "crashes")
+
 ## combine old metrics and new metrics
 new_metrics <- old_metrics %>%
   filter(!crash_date %in% metrics_by_week$crash_date) %>%
-  bind_rows(metrics_by_week) %>%
+  bind_rows(metrics_by_week %>% left_join(totals_by_week)) %>%
   arrange(.metric, crash_date)
 
 ## pin back to RStudio Connect for next time
@@ -85,10 +90,11 @@ p <- new_metrics %>%
              data = model_metrics,
              alpha = 0.7, size = 1.2, lty = 2) +
   geom_line(aes(color = .metric)) +
-  geom_point(aes(color = .metric), size = 2, alpha = 0.8) +
+  geom_point(aes(color = .metric, size = crashes), alpha = 0.8) +
   facet_wrap(~.metric, scales = "free_y", ncol = 1) +
   theme(legend.position = "none") +
   labs(x = NULL, y = NULL) +
+  scale_size(range = c(0, 5)) +
   theme_light()
 
 p <- ggplotly(p)
