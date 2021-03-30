@@ -105,7 +105,7 @@ hide_legend(p)
 
 This dashboard monitors a model for [traffic crashes in Chicago](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if) that predicts whether a crash involves an injury or not. Learn more about this model monitoring project here:
 
-https://github.com/tidymodels/modelops-playground
+https://github.com/juliasilge/modelops-playground
 
 The dashed lines correspond to the model metrics (accuracy and ROC AUC) measured on **testing** data when the model was trained.
 
