@@ -3,6 +3,7 @@ title: "Monitor model for traffic crashes"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
+    source_code: https://github.com/juliasilge/modelops-playground
 ---
 
 ```{r setup, include=FALSE}
