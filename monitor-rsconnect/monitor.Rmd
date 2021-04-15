@@ -21,8 +21,13 @@ library(leaflet)
 library(reactable)
 
 ## get old metrics from RStudio Connect
-board_register("rsconnect", server = "https://colorado.rstudio.com/rsc")
-old_metrics <- pin_get("julia.silge/traffic-crash-metrics", board = "rsconnect")
+board <- board_rsconnect(
+  server = "https://colorado.rstudio.com/rsc", 
+  key = Sys.getenv("CONNECT_API_KEY")
+  )
+
+old_metrics <- board %>%
+  pin_read("julia.silge/traffic-crash-metrics")
 
 
 ## get new crashes from API
@@ -73,7 +78,8 @@ new_metrics <- old_metrics %>%
   arrange(.metric, crash_date)
 
 ## pin back to RStudio Connect for next time
-pin(new_metrics, "traffic-crash-metrics", board = "rsconnect")  
+board %>%
+  pin_write(new_metrics, "traffic-crash-metrics")  
 ```
 
 

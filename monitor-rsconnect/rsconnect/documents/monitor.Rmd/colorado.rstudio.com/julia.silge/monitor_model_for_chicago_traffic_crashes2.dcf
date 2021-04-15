@@ -5,8 +5,9 @@ account: julia.silge
 server: colorado.rstudio.com
 hostUrl: https://colorado.rstudio.com/rsc/__api__
 appId: 8415
-bundleId: 44384
+bundleId: 44715
 url: https://colorado.rstudio.com/rsc/traffic-crash-monitor/
-when: 1617134641.80477
+when: 1618513706.21081
+lastSyncTime: 1618513706.21082
 asMultiple: FALSE
 asStatic: FALSE
