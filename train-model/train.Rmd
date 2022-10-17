@@ -72,8 +72,6 @@ crash %>%
        color = "Injuries?")
 ```
 
-Ah, 2020!
-
 How has the injury rate changed over time?
 
 ```{r}
@@ -208,16 +206,17 @@ Let's now **fit** to the entire training set and **evaluate** on the testing set
 
 ```{r}
 crash_fit <- last_fit(crash_wf, crash_split)
-collect_metrics(crash_fit)
+crash_metrics <- collect_metrics(crash_fit)
+crash_metrics
 ```
 
 Which features were most important in predicting an injury?
 
 ```{r}
-crash_imp <- crash_fit$.workflow[[1]] %>%
-  pull_workflow_fit()
+crash_wf_model <- extract_workflow(crash_fit)
 
-crash_imp$fit$imp %>%
+extract_fit_engine(crash_wf_model) %>%
+  pluck("imp") %>%
   slice_max(value, n = 10) %>%
   ggplot(aes(value, fct_reorder(term, value))) +
   geom_col(alpha = 0.8, fill = "midnightblue") +
@@ -242,25 +241,31 @@ collect_predictions(crash_fit) %>%
 
 ## Save model
 
-We are happy with this model, so we need to save (serialize) it to be used in our model API.
-
-```{r}
-crash_wf_model <- crash_fit$.workflow[[1]]
-```
-
-This is an object we can make predictions with:
+We are happy with this model, so we need to save (serialize) it to be used in our model API. The `crash_wf_model` object we created earlier is a fitted workflow we can make predictions with:
 
 ```{r}
 predict(crash_wf_model, crash_test[222,])
 ```
 
-Now let's save this model and the metrics to be used later.
+Now let's save this model with [vetiver](https://vetiver.rstudio.com/), along with the metrics to be used later.
 
 ```{r}
-saveRDS(crash_wf_model, here::here("crash-api", "crash-wf-model.rds"))
+library(vetiver)
+v <- vetiver_model(
+  crash_wf_model, 
+  "traffic-crash-model", 
+  metadata = list(metrics = crash_metrics)
+)
 
-collect_metrics(crash_fit) %>%
-  write_csv(here::here("crash-api", "crash-model-metrics.csv"))
+v
 ```
 
-**NOTE:** We can [`butcher()` the model](https://tidymodels.github.io/butcher/) to make it smaller in some cases, but this bagged tree model is already streamlined.
+
+```{r}
+library(pins)
+b <- board_rsconnect()
+vetiver_pin_write(b, v)
+```
+
+Next, let's use `vetiver_write_plumber()` to create a [Plumber](https://www.rplumber.io/) file, which we [can then customize](https://github.com/juliasilge/modelops-playground/tree/master/crash-api).
+

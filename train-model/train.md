@@ -1,7 +1,7 @@
 ---
 title: "Train model for traffic crashes"
 author: "Julia Silge"
-date: '2021-01-08'
+date: '2022-10-17'
 output: github_document
 ---
 
@@ -48,22 +48,22 @@ glimpse(crash)
 ```
 
 ```
-## Rows: 207,422
+## Rows: 210,121
 ## Columns: 14
-## $ injuries                <chr> "none", "none", "none", "none", "injuries", "injuries",…
-## $ crash_date              <dttm> 2021-01-03 03:00:00, 2021-01-03 01:37:00, 2021-01-03 0…
-## $ crash_hour              <int> 3, 1, 1, 1, 0, 0, 0, 23, 22, 22, 22, 22, 22, 21, 21, 21…
-## $ report_type             <chr> "ON SCENE", "ON SCENE", "ON SCENE", "ON SCENE", "ON SCE…
-## $ num_units               <int> 3, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 1, 1, 2, 2, 2, 3…
-## $ posted_speed_limit      <int> 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 25, 30,…
-## $ weather_condition       <chr> "SNOW", "BLOWING SNOW", "RAIN", "RAIN", "RAIN", "SLEET/…
-## $ lighting_condition      <chr> "DARKNESS, LIGHTED ROAD", "DARKNESS, LIGHTED ROAD", "DA…
-## $ roadway_surface_cond    <chr> "SNOW OR SLUSH", "WET", "WET", "WET", "WET", "SNOW OR S…
-## $ first_crash_type        <chr> "PARKED MOTOR VEHICLE", "FIXED OBJECT", "REAR TO FRONT"…
-## $ trafficway_type         <chr> "NOT DIVIDED", "DIVIDED - W/MEDIAN (NOT RAISED)", "PARK…
-## $ prim_contributory_cause <chr> "UNABLE TO DETERMINE", "UNABLE TO DETERMINE", "IMPROPER…
-## $ latitude                <dbl> 41.91719, 41.84131, 41.87857, 41.91702, 41.68529, 41.83…
-## $ longitude               <dbl> -87.78755, -87.69498, -87.74506, -87.74793, -87.61574, …
+## $ injuries                <chr> "none", "none", "none", "none", "none", "none", "none", "injuries", "none", "no…
+## $ crash_date              <dttm> 2022-10-16 22:03:00, 2022-10-16 21:27:00, 2022-10-16 21:20:00, 2022-10-16 21:0…
+## $ crash_hour              <int> 22, 21, 21, 21, 21, 20, 20, 20, 19, 19, 19, 19, 18, 18, 18, 18, 17, 17, 17, 17,…
+## $ report_type             <chr> "ON SCENE", "ON SCENE", "ON SCENE", "NOT ON SCENE (DESK REPORT)", "ON SCENE", "…
+## $ num_units               <int> 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 2, 2, 3…
+## $ posted_speed_limit      <int> 30, 30, 25, 35, 30, 30, 30, 30, 30, 30, 35, 30, 30, 30, 30, 30, 25, 30, 30, 25,…
+## $ weather_condition       <chr> "CLEAR", "CLEAR", "CLEAR", "CLEAR", "CLEAR", "CLEAR", "CLEAR", "CLEAR", "CLEAR"…
+## $ lighting_condition      <chr> "DARKNESS, LIGHTED ROAD", "DARKNESS, LIGHTED ROAD", "DARKNESS, LIGHTED ROAD", "…
+## $ roadway_surface_cond    <chr> "DRY", "DRY", "DRY", "DRY", "DRY", "DRY", "DRY", "DRY", "DRY", "DRY", "UNKNOWN"…
+## $ first_crash_type        <chr> "TURNING", "PARKED MOTOR VEHICLE", "PARKED MOTOR VEHICLE", "REAR END", "PARKED …
+## $ trafficway_type         <chr> "DIVIDED - W/MEDIAN (NOT RAISED)", "NOT DIVIDED", "NOT DIVIDED", "FIVE POINT, O…
+## $ prim_contributory_cause <chr> "FAILING TO YIELD RIGHT-OF-WAY", "UNABLE TO DETERMINE", "UNABLE TO DETERMINE", …
+## $ latitude                <dbl> 41.76449, 41.98146, 41.65131, 41.76580, 41.87303, 41.87310, 41.67734, 41.93917,…
+## $ longitude               <dbl> -87.68930, -87.68952, -87.54459, -87.60573, -87.63049, -87.74485, -87.68055, -8…
 ```
 
 
@@ -83,8 +83,6 @@ crash %>%
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
-
-Ah, 2020!
 
 How has the injury rate changed over time?
 
@@ -182,19 +180,19 @@ crash_folds
 
 ```
 ## #  10-fold cross-validation using stratification 
-## # A tibble: 10 x 2
-##    splits               id    
-##    <list>               <chr> 
-##  1 <split [140K/15.6K]> Fold01
-##  2 <split [140K/15.6K]> Fold02
-##  3 <split [140K/15.6K]> Fold03
-##  4 <split [140K/15.6K]> Fold04
-##  5 <split [140K/15.6K]> Fold05
-##  6 <split [140K/15.6K]> Fold06
-##  7 <split [140K/15.6K]> Fold07
-##  8 <split [140K/15.6K]> Fold08
-##  9 <split [140K/15.6K]> Fold09
-## 10 <split [140K/15.6K]> Fold10
+## # A tibble: 10 × 2
+##    splits                 id    
+##    <list>                 <chr> 
+##  1 <split [141830/15760]> Fold01
+##  2 <split [141830/15760]> Fold02
+##  3 <split [141830/15760]> Fold03
+##  4 <split [141830/15760]> Fold04
+##  5 <split [141830/15760]> Fold05
+##  6 <split [141832/15758]> Fold06
+##  7 <split [141832/15758]> Fold07
+##  8 <split [141832/15758]> Fold08
+##  9 <split [141832/15758]> Fold09
+## 10 <split [141832/15758]> Fold10
 ```
 
 Next, let's create a model. 
@@ -227,19 +225,19 @@ crash_wf
 ```
 
 ```
-## ══ Workflow ══════════════════════════════════════════════════════════════════════════════
+## ══ Workflow ═════════════════════════════════════════════════════════════════════════════════════════════════════
 ## Preprocessor: Recipe
 ## Model: bag_tree()
 ## 
-## ── Preprocessor ──────────────────────────────────────────────────────────────────────────
+## ── Preprocessor ─────────────────────────────────────────────────────────────────────────────────────────────────
 ## 4 Recipe Steps
 ## 
-## ● step_date()
-## ● step_rm()
-## ● step_other()
-## ● step_downsample()
+## • step_date()
+## • step_rm()
+## • step_other()
+## • step_downsample()
 ## 
-## ── Model ─────────────────────────────────────────────────────────────────────────────────
+## ── Model ────────────────────────────────────────────────────────────────────────────────────────────────────────
 ## Bagged Decision Tree Model Specification (classification)
 ## 
 ## Main Arguments:
@@ -274,11 +272,11 @@ collect_metrics(crash_res)
 ```
 
 ```
-## # A tibble: 2 x 6
+## # A tibble: 2 × 6
 ##   .metric  .estimator  mean     n  std_err .config             
 ##   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-## 1 accuracy binary     0.727    10 0.00136  Preprocessor1_Model1
-## 2 roc_auc  binary     0.819    10 0.000788 Preprocessor1_Model1
+## 1 accuracy binary     0.725    10 0.000999 Preprocessor1_Model1
+## 2 roc_auc  binary     0.813    10 0.00128  Preprocessor1_Model1
 ```
 
 This is almost exactly what we achieved with models like random forest and xgboost, and looks to be about as good as we can do with this data.
@@ -288,25 +286,26 @@ Let's now **fit** to the entire training set and **evaluate** on the testing set
 
 ```r
 crash_fit <- last_fit(crash_wf, crash_split)
-collect_metrics(crash_fit)
+crash_metrics <- collect_metrics(crash_fit)
+crash_metrics
 ```
 
 ```
-## # A tibble: 2 x 4
+## # A tibble: 2 × 4
 ##   .metric  .estimator .estimate .config             
 ##   <chr>    <chr>          <dbl> <chr>               
-## 1 accuracy binary         0.725 Preprocessor1_Model1
-## 2 roc_auc  binary         0.817 Preprocessor1_Model1
+## 1 accuracy binary         0.722 Preprocessor1_Model1
+## 2 roc_auc  binary         0.813 Preprocessor1_Model1
 ```
 
 Which features were most important in predicting an injury?
 
 
 ```r
-crash_imp <- crash_fit$.workflow[[1]] %>%
-  pull_workflow_fit()
+crash_wf_model <- extract_workflow(crash_fit)
 
-crash_imp$fit$imp %>%
+extract_fit_engine(crash_wf_model) %>%
+  pluck("imp") %>%
   slice_max(value, n = 10) %>%
   ggplot(aes(value, fct_reorder(term, value))) +
   geom_col(alpha = 0.8, fill = "midnightblue") +
@@ -336,14 +335,7 @@ collect_predictions(crash_fit) %>%
 
 ## Save model
 
-We are happy with this model, so we need to save (serialize) it to be used in our model API.
-
-
-```r
-crash_wf_model <- crash_fit$.workflow[[1]]
-```
-
-This is an object we can make predictions with:
+We are happy with this model, so we need to save (serialize) it to be used in our model API. The `crash_wf_model` object we created earlier is a fitted workflow we can make predictions with:
 
 
 ```r
@@ -351,20 +343,39 @@ predict(crash_wf_model, crash_test[222,])
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   .pred_class
 ##   <fct>      
 ## 1 none
 ```
 
-Now let's save this model and the metrics to be used later.
+Now let's save this model with [vetiver](https://vetiver.rstudio.com/), along with the metrics to be used later.
 
 
 ```r
-saveRDS(crash_wf_model, here::here("crash-api", "crash-wf-model.rds"))
+library(vetiver)
+v <- vetiver_model(
+  crash_wf_model, 
+  "traffic-crash-model", 
+  metadata = list(metrics = crash_metrics)
+)
 
-collect_metrics(crash_fit) %>%
-  write_csv(here::here("crash-api", "crash-model-metrics.csv"))
+v
 ```
 
-**NOTE:** We can [`butcher()` the model](https://tidymodels.github.io/butcher/) to make it smaller in some cases, but this bagged tree model is already streamlined.
+```
+## 
+## ── traffic-crash-model ─ <bundled_workflow> model for deployment 
+## A rpart classification modeling workflow using 13 features
+```
+
+
+
+```r
+library(pins)
+b <- board_rsconnect()
+vetiver_pin_write(b, v)
+```
+
+Next, let's use `vetiver_write_plumber()` to create a [Plumber](https://www.rplumber.io/) file, which we [can then customize](https://github.com/juliasilge/modelops-playground/tree/master/crash-api).
+
