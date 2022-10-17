@@ -254,7 +254,7 @@ library(vetiver)
 v <- vetiver_model(
   crash_wf_model, 
   "traffic-crash-model", 
-  metadata = list(metrics = crash_metrics)
+  metadata = list(metrics = crash_metrics %>% dplyr::select(-.config))
 )
 
 v
