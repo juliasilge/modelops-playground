@@ -1,0 +1,11 @@
+name: monitor-rsconnect
+title:
+username: julia.silge
+account: julia.silge
+server: colorado.rstudio.com
+hostUrl: https://colorado.rstudio.com/rsc/__api__
+appId: 8415
+bundleId: 64317
+url: https://colorado.rstudio.com/rsc/traffic-crash-monitor/
+when: 1666379654.62744
+lastSyncTime: 1666379654.62746
